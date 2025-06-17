@@ -1,8 +1,9 @@
 import * as React from 'react';
-import { Text, View } from 'react-native';
 import { createStaticNavigation, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from './src/screens/Home';
+import { ThemeProvider } from 'styled-components';
+import theme from './src/theme';
 
 const RootStack = createNativeStackNavigator({
   screens: {
@@ -17,6 +18,11 @@ const RootStack = createNativeStackNavigator({
 
 const Navigation = createStaticNavigation(RootStack);
 
+
 export default function App() {
-  return <Navigation />;
+  return (
+        <ThemeProvider theme={theme}>
+          <Navigation />
+        </ThemeProvider>
+  )
 }
