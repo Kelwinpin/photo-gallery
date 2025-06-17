@@ -1,19 +1,18 @@
 import React, { useState, useCallback } from 'react';
-import { 
-  Text, 
-  FlatList, 
-  Image, 
-  TouchableOpacity, 
-  Alert, 
+import {
+  Text,
+  FlatList,
+  Alert,
   RefreshControl,
   View,
-  StyleSheet 
+  StyleSheet
 } from 'react-native';
 import { Container } from './styles';
 import AddButton from '../../components/AddButton';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { photoService, Photo } from '../../services/photoService';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import Card from '../../components/Card';
 
 export default function Home() {
   const navigation = useNavigation();
@@ -24,7 +23,6 @@ export default function Home() {
   const loadPhotos = async () => {
     try {
       const loadedPhotos = await photoService.getAllPhotos();
-      console.log("🚀 ~ loadPhotos ~ loadedPhotos:", loadedPhotos)
       const sortedPhotos = loadedPhotos.sort(
         (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
       );
@@ -74,60 +72,6 @@ export default function Home() {
     );
   };
 
-  const formatCoordinate = (coord: number): string => {
-    return `${Math.abs(coord).toFixed(6)}°`;
-  };
-
-  const formatDate = (date: Date): string => {
-    return new Intl.DateTimeFormat('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(new Date(date));
-  };
-
-  const renderPhotoItem = ({ item }: { item: Photo }) => (
-    <View style={styles.photoContainer}>
-      <TouchableOpacity 
-        style={styles.photoTouchable}
-        onPress={() => {
-          console.log('Foto selecionada:', item.id);
-        }}
-      >
-        <Image 
-          source={{ uri: item.uri }} 
-          style={styles.photoImage}
-          resizeMode="cover"
-        />
-        
-        <TouchableOpacity 
-          style={styles.deleteButton}
-          onPress={() => handleDeletePhoto(item.id)}
-        >
-          <Ionicons name="trash" size={20} color="white" />
-        </TouchableOpacity>
-      </TouchableOpacity>
-      
-      <View style={styles.photoInfo}>
-        <View style={styles.locationContainer}>
-          <Ionicons name="location" size={16} color="#666" />
-          <Text style={styles.locationText}>
-            {formatCoordinate(item.location.latitude)}, {formatCoordinate(item.location.longitude)}
-          </Text>
-        </View>
-        
-        <View style={styles.dateContainer}>
-          <Ionicons name="time" size={16} color="#666" />
-          <Text style={styles.dateText}>
-            {formatDate(item.timestamp)}
-          </Text>
-        </View>
-      </View>
-    </View>
-  );
-
   const renderEmptyState = () => (
     <View style={styles.emptyContainer}>
       <Ionicons name="camera-outline" size={80} color="#ccc" />
@@ -161,7 +105,7 @@ export default function Home() {
       <FlatList
         data={photos}
         keyExtractor={(item) => item.id}
-        renderItem={renderPhotoItem}
+        renderItem={({ item }) => <Card item={item} handleDeletePhoto={handleDeletePhoto} />}
         numColumns={2}
         contentContainerStyle={styles.listContainer}
         columnWrapperStyle={styles.row}
@@ -175,7 +119,7 @@ export default function Home() {
         }
         ListEmptyComponent={renderEmptyState}
       />
-      
+
       <AddButton onPress={() => navigation.navigate("Camera")} />
     </Container>
   );
@@ -202,8 +146,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   row: {
-    justifyContent: 'space-between',
-    paddingHorizontal: 5,
+    justifyContent: 'space-evenly',
   },
   photoContainer: {
     flex: 1,
