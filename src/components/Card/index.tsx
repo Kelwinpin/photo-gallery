@@ -4,14 +4,17 @@ import { Photo } from "../../services/photoService";
 import { Ionicons } from "@expo/vector-icons";
 import { formatDate } from "../../utils/fomatDate";
 import { formatCoordinate } from "../../utils/fomatCoords";
+import { useNavigation } from "@react-navigation/native";
 
 export default function Card({ item, handleDeletePhoto }: { item: Photo, handleDeletePhoto: (photoId: string) => void }) {
+    const navigation = useNavigation();
+
     return (
         <View style={styles.photoContainer}>
             <TouchableOpacity
                 style={styles.photoTouchable}
                 onPress={() => {
-                    console.log('Foto selecionada:', item.id);
+                    navigation.navigate("PhotoDetails", { id: item.id });
                 }}
             >
                 <Image
