@@ -27,22 +27,52 @@ import { useNavigation } from '@react-navigation/native';
 import { formatDate } from "../../utils/fomatDate";
 import { formatCoordinate } from "../../utils/fomatCoords";
 import PhotoDetailsPanel from "../../components/PhotoDetailsPanel";
+import useResponsiveDimensions from "../../utils/hooks/useResponsiveDimensions";
 
-const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
-const PANEL_HEIGHT = screenHeight * 0.4;
+
+const getResponsiveValues = (dimensions: ReturnType<typeof useResponsiveDimensions>) => {
+  const { width, height, isTablet, isLandscape, isSmallScreen } = dimensions;
+  
+  let panelHeight;
+  if (isTablet) {
+    panelHeight = isLandscape ? height * 0.6 : height * 0.45;
+  } else {
+    panelHeight = isLandscape ? height * 0.7 : height * 0.4;
+  }
+  
+  const iconSize = isSmallScreen ? 24 : isTablet ? 32 : 28;
+  const infoButtonSize = isSmallScreen ? 50 : isTablet ? 70 : 60;
+  const headerPadding = isSmallScreen ? 12 : isTablet ? 24 : 20;
+  
+  return {
+    panelHeight,
+    iconSize,
+    infoButtonSize,
+    headerPadding,
+    maxImageWidth: isTablet && isLandscape ? width * 0.7 : width,
+  };
+};
 
 export default function PhotoDetails({ route }: { route: { params: { id: string } } }) {
   const [photo, setPhoto] = useState<Photo | null>(null);
   const [loading, setLoading] = useState(true);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const navigation = useNavigation();
+  const dimensions = useResponsiveDimensions();
+  const responsiveValues = getResponsiveValues(dimensions);
 
-  const translateY = useSharedValue(PANEL_HEIGHT);
+  const translateY = useSharedValue(responsiveValues.panelHeight);
   const headerOpacity = useSharedValue(1);
 
   useEffect(() => {
     loadPhoto();
   }, []);
+
+  useEffect(() => {
+    if (!isPanelOpen) {
+      translateY.value = responsiveValues.panelHeight;
+    }
+  }, [responsiveValues.panelHeight, isPanelOpen]);
 
   const loadPhoto = async () => {
     try {
@@ -59,7 +89,7 @@ export default function PhotoDetails({ route }: { route: { params: { id: string 
   const togglePanel = () => {
     const isOpening = !isPanelOpen;
     
-    translateY.value = withSpring(isOpening ? 0 : PANEL_HEIGHT, {
+    translateY.value = withSpring(isOpening ? 0 : responsiveValues.panelHeight, {
       damping: 20,
       stiffness: 90,
     });
@@ -73,10 +103,10 @@ export default function PhotoDetails({ route }: { route: { params: { id: string 
 
   const panGesture = Gesture.Pan()
     .onUpdate((event) => {
-      const newTranslateY = Math.max(0, Math.min(PANEL_HEIGHT, event.translationY));
+      const newTranslateY = Math.max(0, Math.min(responsiveValues.panelHeight, event.translationY));
       translateY.value = newTranslateY;
       
-      const progress = 1 - (newTranslateY / PANEL_HEIGHT);
+      const progress = 1 - (newTranslateY / responsiveValues.panelHeight);
       headerOpacity.value = interpolate(
         progress,
         [0, 1],
@@ -85,9 +115,9 @@ export default function PhotoDetails({ route }: { route: { params: { id: string 
       );
     })
     .onEnd((event) => {
-      const shouldOpen = event.translationY < PANEL_HEIGHT / 2;
+      const shouldOpen = event.translationY < responsiveValues.panelHeight / 2;
       
-      translateY.value = withSpring(shouldOpen ? 0 : PANEL_HEIGHT, {
+      translateY.value = withSpring(shouldOpen ? 0 : responsiveValues.panelHeight, {
         damping: 20,
         stiffness: 90,
       });
@@ -162,21 +192,78 @@ export default function PhotoDetails({ route }: { route: { params: { id: string 
   const animatedBackdropStyle = useAnimatedStyle(() => {
     const opacity = interpolate(
       translateY.value,
-      [0, PANEL_HEIGHT],
+      [0, responsiveValues.panelHeight],
       [0.5, 0],
       Extrapolate.CLAMP
     );
     return {
       opacity,
-      pointerEvents: translateY.value < PANEL_HEIGHT ? 'auto' : 'none',
+      pointerEvents: translateY.value < responsiveValues.panelHeight ? 'auto' : 'none',
     };
+  });
+
+  const dynamicStyles = StyleSheet.create({
+    header: {
+      paddingHorizontal: responsiveValues.headerPadding,
+      paddingTop: (StatusBar.currentHeight || (dimensions.isTablet ? 50 : 44)) + 16,
+      paddingBottom: dimensions.isTablet ? 32 : 24,
+    },
+    headerButton: {
+      padding: dimensions.isSmallScreen ? 8 : dimensions.isTablet ? 16 : 12,
+      borderRadius: dimensions.isTablet ? 30 : 25,
+    },
+    headerActions: {
+      gap: dimensions.isSmallScreen ? 12 : dimensions.isTablet ? 20 : 16,
+    },
+    infoButton: {
+      bottom: dimensions.isLandscape ? 40 : 60,
+      right: dimensions.isSmallScreen ? 16 : 24,
+      width: responsiveValues.infoButtonSize,
+      height: responsiveValues.infoButtonSize,
+      borderRadius: responsiveValues.infoButtonSize / 2,
+    },
+    infoPanel: {
+      height: responsiveValues.panelHeight,
+      borderTopLeftRadius: dimensions.isTablet ? 32 : 24,
+      borderTopRightRadius: dimensions.isTablet ? 32 : 24,
+    },
+    imageContainer: {
+      width: dimensions.width,
+      height: dimensions.height,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    fullscreenImage: {
+      width: responsiveValues.maxImageWidth,
+      height: dimensions.height,
+      maxWidth: dimensions.width,
+      maxHeight: dimensions.height,
+    },
+    loadingText: {
+      fontSize: dimensions.isTablet ? 18 : 16,
+    },
+    errorText: {
+      fontSize: dimensions.isTablet ? 20 : 18,
+      textAlign: 'center',
+      paddingHorizontal: 20,
+    },
+    backButton: {
+      paddingHorizontal: dimensions.isTablet ? 32 : 24,
+      paddingVertical: dimensions.isTablet ? 16 : 12,
+      borderRadius: dimensions.isTablet ? 12 : 8,
+    },
+    backButtonText: {
+      fontSize: dimensions.isTablet ? 18 : 16,
+    },
   });
 
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Carregando foto...</Text>
+          <Text style={[styles.loadingText, dynamicStyles.loadingText]}>
+            Carregando foto...
+          </Text>
         </View>
       </SafeAreaView>
     );
@@ -186,13 +273,21 @@ export default function PhotoDetails({ route }: { route: { params: { id: string 
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.errorContainer}>
-          <Ionicons name="alert-circle-outline" size={64} color="#ccc" />
-          <Text style={styles.errorText}>Foto não encontrada</Text>
+          <Ionicons 
+            name="alert-circle-outline" 
+            size={dimensions.isTablet ? 80 : 64} 
+            color="#ccc" 
+          />
+          <Text style={[styles.errorText, dynamicStyles.errorText]}>
+            Foto não encontrada
+          </Text>
           <TouchableOpacity 
-            style={styles.backButton}
+            style={[styles.backButton, dynamicStyles.backButton]}
             onPress={() => navigation.goBack()}
           >
-            <Text style={styles.backButtonText}>Voltar</Text>
+            <Text style={[styles.backButtonText, dynamicStyles.backButtonText]}>
+              Voltar
+            </Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -203,45 +298,47 @@ export default function PhotoDetails({ route }: { route: { params: { id: string 
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="black" />
       
-      <Image 
-        source={{ uri: photo.uri }} 
-        style={styles.fullscreenImage}
-        resizeMode="cover"
-      />
+      <View style={dynamicStyles.imageContainer}>
+        <Image 
+          source={{ uri: photo.uri }} 
+          style={dynamicStyles.fullscreenImage}
+          resizeMode="contain"
+        />
+      </View>
 
-      <Animated.View style={[styles.header, animatedHeaderStyle]}>
+      <Animated.View style={[styles.header, dynamicStyles.header, animatedHeaderStyle]}>
         <TouchableOpacity 
-          style={styles.headerButton}
+          style={[styles.headerButton, dynamicStyles.headerButton]}
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name="arrow-back" size={28} color="white" />
+          <Ionicons name="arrow-back" size={responsiveValues.iconSize} color="white" />
         </TouchableOpacity>
         
-        <View style={styles.headerActions}>
+        <View style={[styles.headerActions, dynamicStyles.headerActions]}>
           <TouchableOpacity 
-            style={styles.headerButton}
+            style={[styles.headerButton, dynamicStyles.headerButton]}
             onPress={handleSharePhoto}
           >
-            <Ionicons name="share-outline" size={28} color="white" />
+            <Ionicons name="share-outline" size={responsiveValues.iconSize} color="white" />
           </TouchableOpacity>
           
           <TouchableOpacity 
-            style={styles.headerButton}
+            style={[styles.headerButton, dynamicStyles.headerButton]}
             onPress={handleDeletePhoto}
           >
-            <Ionicons name="trash-outline" size={28} color="white" />
+            <Ionicons name="trash-outline" size={responsiveValues.iconSize} color="white" />
           </TouchableOpacity>
         </View>
       </Animated.View>
 
       <TouchableOpacity 
-        style={styles.infoButton}
+        style={[styles.infoButton, dynamicStyles.infoButton]}
         onPress={togglePanel}
         activeOpacity={0.8}
       >
         <Ionicons 
           name={isPanelOpen ? "close" : "information-circle-outline"} 
-          size={32} 
+          size={responsiveValues.iconSize + 4} 
           color="white" 
         />
       </TouchableOpacity>
@@ -249,8 +346,8 @@ export default function PhotoDetails({ route }: { route: { params: { id: string 
       <Animated.View style={[styles.backdrop, animatedBackdropStyle]} />
 
       <GestureDetector gesture={panGesture}>
-        <Animated.View style={[styles.infoPanel, animatedPanelStyle]}>
-            <PhotoDetailsPanel photo={photo} closePanel={togglePanel} />
+        <Animated.View style={[styles.infoPanel, dynamicStyles.infoPanel, animatedPanelStyle]}>
+          <PhotoDetailsPanel photo={photo} closePanel={togglePanel} />
         </Animated.View>
       </GestureDetector>
     </View>
@@ -262,11 +359,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000',
   },
-  fullscreenImage: {
-    width: screenWidth,
-    height: screenHeight,
-    position: 'absolute',
-  },
   header: {
     position: 'absolute',
     top: 0,
@@ -275,28 +367,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: (StatusBar.currentHeight || 44) + 16,
-    paddingBottom: 24,
     zIndex: 2,
     backgroundColor: 'rgba(0,0,0,0.4)',
   },
   headerButton: {
-    padding: 12,
-    borderRadius: 25,
     backgroundColor: 'rgba(0,0,0,0.6)',
   },
   headerActions: {
     flexDirection: 'row',
-    gap: 16,
   },
   infoButton: {
     position: 'absolute',
-    bottom: 60,
-    right: 24,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
     backgroundColor: 'rgba(0,0,0,0.7)',
     justifyContent: 'center',
     alignItems: 'center',
@@ -324,10 +405,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: PANEL_HEIGHT,
     backgroundColor: '#fff',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
     zIndex: 4,
     shadowColor: '#000',
     shadowOffset: {
@@ -345,7 +423,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   loadingText: {
-    fontSize: 16,
     color: '#666',
   },
   errorContainer: {
@@ -356,20 +433,15 @@ const styles = StyleSheet.create({
     padding: 40,
   },
   errorText: {
-    fontSize: 18,
     color: '#666',
     marginTop: 16,
     marginBottom: 24,
   },
   backButton: {
     backgroundColor: '#6200EE',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
   },
   backButtonText: {
     color: 'white',
-    fontSize: 16,
     fontWeight: '600',
   },
 });

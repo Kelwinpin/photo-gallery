@@ -1,11 +1,61 @@
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import React, { useEffect, useState, useRef } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, Alert, ActivityIndicator } from 'react-native';
+import { 
+  StyleSheet, 
+  Text, 
+  TouchableOpacity, 
+  View, 
+  Alert, 
+  ActivityIndicator 
+} from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import * as Location from 'expo-location';
 import { Button } from '../../components/Button';
 import { photoService } from '../../services/photoService';
+import useResponsiveDimensions from '../../utils/hooks/useResponsiveDimensions';
+
+const getResponsiveValues = (dimensions: ReturnType<typeof useResponsiveDimensions>) => {
+  const { isTablet, isSmallScreen, isLargeTablet, isExtraLarge } = dimensions;
+  
+  const iconSize = isExtraLarge ? 60 : isLargeTablet ? 56 : isTablet ? 52 : isSmallScreen ? 40 : 48;
+  const closeIconSize = isExtraLarge ? 50 : isLargeTablet ? 46 : isTablet ? 42 : isSmallScreen ? 32 : 40;
+  const locationIconSize = isExtraLarge ? 24 : isLargeTablet ? 22 : isTablet ? 20 : isSmallScreen ? 16 : 20;
+  
+  const loadingFontSize = isExtraLarge ? 20 : isLargeTablet ? 18 : isTablet ? 17 : isSmallScreen ? 14 : 16;
+  const messageFontSize = isExtraLarge ? 20 : isLargeTablet ? 18 : isTablet ? 17 : isSmallScreen ? 14 : 16;
+  const locationFontSize = isExtraLarge ? 16 : isLargeTablet ? 14 : isTablet ? 13 : isSmallScreen ? 10 : 12;
+  
+  const buttonGap = isExtraLarge ? 60 : isLargeTablet ? 50 : isTablet ? 45 : isSmallScreen ? 30 : 40;
+  const buttonContainerPadding = isExtraLarge ? 80 : isLargeTablet ? 72 : isTablet ? 68 : isSmallScreen ? 48 : 64;
+  const closeButtonPadding = isExtraLarge ? 6 : isLargeTablet ? 4 : isTablet ? 3 : isSmallScreen ? 2 : 2;
+  const closeButtonRadius = isExtraLarge ? 40 : isLargeTablet ? 36 : isTablet ? 34 : isSmallScreen ? 26 : 32;
+  
+  const locationTop = isTablet ? 60 : isSmallScreen ? 40 : 50;
+  const locationRight = isExtraLarge ? 30 : isLargeTablet ? 25 : isTablet ? 22 : isSmallScreen ? 15 : 20;
+  const locationPadding = isExtraLarge ? 12 : isLargeTablet ? 10 : isTablet ? 9 : isSmallScreen ? 6 : 8;
+  const locationRadius = isExtraLarge ? 20 : isLargeTablet ? 18 : isTablet ? 17 : isSmallScreen ? 12 : 16;
+  
+  const messagePadding = isExtraLarge ? 30 : isLargeTablet ? 25 : isTablet ? 20 : isSmallScreen ? 12 : 16;
+  
+  return {
+    iconSize,
+    closeIconSize,
+    locationIconSize,
+    loadingFontSize,
+    messageFontSize,
+    locationFontSize,
+    buttonGap,
+    buttonContainerPadding,
+    closeButtonPadding,
+    closeButtonRadius,
+    locationTop,
+    locationRight,
+    locationPadding,
+    locationRadius,
+    messagePadding,
+  };
+};
 
 export default function CameraScreen() {
   const [facing, setFacing] = useState<CameraType>('back');
@@ -17,6 +67,8 @@ export default function CameraScreen() {
   
   const cameraRef = useRef<CameraView>(null);
   const navigate = useNavigation();
+  const dimensions = useResponsiveDimensions();
+  const responsiveValues = getResponsiveValues(dimensions);
 
   useEffect(() => {
     async function getCurrentLocation() {
@@ -100,11 +152,45 @@ export default function CameraScreen() {
     }
   };
 
+  const dynamicStyles = StyleSheet.create({
+    loadingText: {
+      fontSize: responsiveValues.loadingFontSize,
+    },
+    message: {
+      fontSize: responsiveValues.messageFontSize,
+      paddingHorizontal: responsiveValues.messagePadding,
+      paddingBottom: responsiveValues.messagePadding / 2,
+    },
+    buttonContainer: {
+      paddingBottom: responsiveValues.buttonContainerPadding,
+      gap: responsiveValues.buttonGap,
+    },
+    buttonClose: {
+      borderRadius: responsiveValues.closeButtonRadius,
+      padding: responsiveValues.closeButtonPadding,
+    },
+    locationIndicator: {
+      top: responsiveValues.locationTop,
+      right: responsiveValues.locationRight,
+      padding: responsiveValues.locationPadding,
+      borderRadius: responsiveValues.locationRadius,
+    },
+    locationText: {
+      fontSize: responsiveValues.locationFontSize,
+    },
+  });
+
+  function toggleCameraFacing() {
+    setFacing(current => (current === 'back' ? 'front' : 'back'));
+  }
+
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#007AFF" />
-        <Text style={styles.loadingText}>Carregando câmera...</Text>
+        <Text style={[styles.loadingText, dynamicStyles.loadingText]}>
+          Carregando câmera...
+        </Text>
       </View>
     );
   }
@@ -113,7 +199,9 @@ export default function CameraScreen() {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#007AFF" />
-        <Text style={styles.loadingText}>Verificando permissões...</Text>
+        <Text style={[styles.loadingText, dynamicStyles.loadingText]}>
+          Verificando permissões...
+        </Text>
       </View>
     );
   }
@@ -121,17 +209,15 @@ export default function CameraScreen() {
   if (!permission.granted) {
     return (
       <View style={styles.container}>
-        <Text style={styles.message}>Precisamos de permissão para usar a câmera</Text>
+        <Text style={[styles.message, dynamicStyles.message]}>
+          Precisamos de permissão para usar a câmera
+        </Text>
         <View style={styles.buttonPermissionContainer}>
           <Button text="Permitir" onPress={() => requestPermission()} />
           <Button text="Agora Não" onPress={() => navigate.goBack()} type='outlined' />
         </View>
       </View>
     );
-  }
-
-  function toggleCameraFacing() {
-    setFacing(current => (current === 'back' ? 'front' : 'back'));
   }
 
   return (
@@ -141,9 +227,13 @@ export default function CameraScreen() {
         style={{ flex: 1, width: '100%', height: '100%' }}
         facing={facing}
       >
-        <View style={styles.buttonContainer}>
+        <View style={[styles.buttonContainer, dynamicStyles.buttonContainer]}>
           <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
-            <Ionicons name="camera-reverse-sharp" size={48} color="white" />
+            <Ionicons 
+              name="camera-reverse-sharp" 
+              size={responsiveValues.iconSize} 
+              color="white" 
+            />
           </TouchableOpacity>
           
           <TouchableOpacity 
@@ -153,23 +243,30 @@ export default function CameraScreen() {
           >
             <Ionicons 
               name={isCapturing ? "hourglass" : "camera"} 
-              size={48} 
+              size={responsiveValues.iconSize} 
               color={isCapturing ? "gray" : "white"} 
             />
           </TouchableOpacity>
           
-          <TouchableOpacity style={styles.buttonClose} onPress={() => navigate.goBack()}>
-            <Ionicons name="close" size={40} color="white" />
+          <TouchableOpacity 
+            style={[styles.buttonClose, dynamicStyles.buttonClose]} 
+            onPress={() => navigate.goBack()}
+          >
+            <Ionicons 
+              name="close" 
+              size={responsiveValues.closeIconSize} 
+              color="white" 
+            />
           </TouchableOpacity>
         </View>
         
-        <View style={styles.locationIndicator}>
+        <View style={[styles.locationIndicator, dynamicStyles.locationIndicator]}>
           <Ionicons 
             name={location ? "location" : "location-outline"} 
-            size={20} 
+            size={responsiveValues.locationIconSize} 
             color={location ? "green" : "red"} 
           />
-          <Text style={styles.locationText}>
+          <Text style={[styles.locationText, dynamicStyles.locationText]}>
             {location ? "GPS Ativo" : "GPS Inativo"}
           </Text>
         </View>
@@ -193,7 +290,6 @@ const styles = StyleSheet.create({
   loadingText: {
     color: 'white',
     marginTop: 16,
-    fontSize: 16,
   },
   buttonPermissionContainer: {
     justifyContent: 'center',
@@ -201,7 +297,7 @@ const styles = StyleSheet.create({
   },
   message: {
     textAlign: 'center',
-    paddingBottom: 10,
+    color: '#333',
   },
   button: {
     alignSelf: 'flex-end',
@@ -211,9 +307,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingBottom: 64,
     flexDirection: 'row',
-    gap: 40,
   },
   buttonDisabled: {
     opacity: 0.5,
@@ -222,22 +316,16 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
     alignItems: 'center',
     backgroundColor: '#F75A68',
-    borderRadius: 32,
-    padding: 2,
+    justifyContent: 'center',
   },
   locationIndicator: {
     position: 'absolute',
-    top: 50,
-    right: 20,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'rgba(0,0,0,0.5)',
-    padding: 8,
-    borderRadius: 16,
   },
   locationText: {
     color: 'white',
     marginLeft: 4,
-    fontSize: 12,
   },
 });

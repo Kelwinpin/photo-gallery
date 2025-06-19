@@ -6,100 +6,159 @@ import { formatDate } from "../../utils/fomatDate";
 import { formatCoordinate } from "../../utils/fomatCoords";
 import { useNavigation } from "@react-navigation/native";
 
-export default function Card({ item, handleDeletePhoto }: { item: Photo, handleDeletePhoto: (photoId: string) => void }) {
-    const navigation = useNavigation<any>();
+interface CardProps {
+  item: Photo;
+  handleDeletePhoto: (photoId: string) => void;
+  cardWidth: number;
+  imageHeight: number;
+  cardMargin: number;
+}
 
-    return (
-        <View style={styles.photoContainer}>
-            <TouchableOpacity
-                style={styles.photoTouchable}
-                onPress={() => {
-                    navigation.navigate("PhotoDetails", { id: item.id });
-                }}
-            >
-                <Image
-                    source={{ uri: item.uri }}
-                    style={styles.photoImage}
-                    resizeMode="cover"
-                />
+export default function Card({ 
+  item, 
+  handleDeletePhoto, 
+  cardWidth, 
+  imageHeight, 
+  cardMargin 
+}: CardProps) {
+  const navigation = useNavigation<any>();
 
-                <TouchableOpacity
-                    style={styles.deleteButton}
-                    onPress={() => handleDeletePhoto(item.id)}
-                >
-                    <Ionicons name="trash" size={20} color="white" />
-                </TouchableOpacity>
-            </TouchableOpacity>
+  // Calcular valores responsivos baseados no cardWidth
+  const isSmallCard = cardWidth < 150;
+  const isMediumCard = cardWidth >= 150 && cardWidth < 200;
+  const isLargeCard = cardWidth >= 200;
 
-            <View style={styles.photoInfo}>
-                <View style={styles.locationContainer}>
-                    <Ionicons name="location" size={16} color="#666" />
-                    <Text style={styles.locationText}>
-                        {formatCoordinate(item.location.latitude)}, {formatCoordinate(item.location.longitude)}
-                    </Text>
-                </View>
+  // Tamanhos de fonte responsivos
+  const locationFontSize = isSmallCard ? 10 : isMediumCard ? 11 : 12;
+  const dateFontSize = isSmallCard ? 10 : isMediumCard ? 11 : 12;
+  
+  // Tamanhos de ícones responsivos
+  const iconSize = isSmallCard ? 12 : 14;
+  const deleteIconSize = isSmallCard ? 16 : 18;
+  
+  // Espaçamentos responsivos
+  const infoPadding = isSmallCard ? 8 : isMediumCard ? 12 : 15;
+  const locationMarginBottom = isSmallCard ? 4 : 6;
+  const deleteButtonSize = isSmallCard ? 28 : 32;
+  const deleteButtonPadding = isSmallCard ? 4 : 6;
+  const deleteButtonTop = isSmallCard ? 6 : 8;
+  const deleteButtonRight = isSmallCard ? 6 : 8;
 
-                <View style={styles.dateContainer}>
-                    <Ionicons name="time" size={16} color="#666" />
-                    <Text style={styles.dateText}>
-                        {formatDate(item.timestamp)}
-                    </Text>
-                </View>
-            </View>
+  // Estilos dinâmicos
+  const dynamicStyles = StyleSheet.create({
+    photoContainer: {
+      width: cardWidth,
+      margin: cardMargin,
+    },
+    photoImage: {
+      height: imageHeight,
+    },
+    deleteButton: {
+      top: deleteButtonTop,
+      right: deleteButtonRight,
+      width: deleteButtonSize,
+      height: deleteButtonSize,
+      padding: deleteButtonPadding,
+    },
+    photoInfo: {
+      padding: infoPadding,
+    },
+    locationContainer: {
+      marginBottom: locationMarginBottom,
+    },
+    locationText: {
+      fontSize: locationFontSize,
+    },
+    dateText: {
+      fontSize: dateFontSize,
+    },
+  });
+
+  return (
+    <View style={[styles.photoContainer, dynamicStyles.photoContainer]}>
+      <TouchableOpacity
+        style={styles.photoTouchable}
+        onPress={() => {
+          navigation.navigate("PhotoDetails", { id: item.id });
+        }}
+      >
+        <Image
+          source={{ uri: item.uri }}
+          style={[styles.photoImage, dynamicStyles.photoImage]}
+          resizeMode="cover"
+        />
+
+        <TouchableOpacity
+          style={[styles.deleteButton, dynamicStyles.deleteButton]}
+          onPress={() => handleDeletePhoto(item.id)}
+        >
+          <Ionicons name="trash" size={deleteIconSize} color="white" />
+        </TouchableOpacity>
+      </TouchableOpacity>
+
+      <View style={[styles.photoInfo, dynamicStyles.photoInfo]}>
+        <View style={[styles.locationContainer, dynamicStyles.locationContainer]}>
+          <Ionicons name="location" size={iconSize} color="#666" />
+          <Text style={[styles.locationText, dynamicStyles.locationText]} numberOfLines={1}>
+            {formatCoordinate(item.location.latitude)}, {formatCoordinate(item.location.longitude)}
+          </Text>
         </View>
-    );
+
+        <View style={styles.dateContainer}>
+          <Ionicons name="time" size={iconSize} color="#666" />
+          <Text style={[styles.dateText, dynamicStyles.dateText]} numberOfLines={1}>
+            {formatDate(item.timestamp)}
+          </Text>
+        </View>
+      </View>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-    photoContainer: {
-        flex: 1,
-        margin: 5,
-        backgroundColor: '#fff',
-        borderRadius: 12,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-    },
-    photoTouchable: {
-        position: 'relative',
-    },
-    photoImage: {
-        width: '100%',
-        height: 200,
-        borderTopLeftRadius: 12,
-        borderTopRightRadius: 12,
-    },
-    deleteButton: {
-        position: 'absolute',
-        top: 8,
-        right: 8,
-        backgroundColor: 'rgba(255, 0, 0, 0.7)',
-        borderRadius: 20,
-        padding: 6,
-    },
-    photoInfo: {
-        padding: 15,
-    },
-    locationContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 8,
-    },
-    locationText: {
-        fontSize: 12,
-        color: '#666',
-        marginLeft: 4,
-        flex: 1,
-    },
-    dateContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    dateText: {
-        fontSize: 12,
-        color: '#666',
-        marginLeft: 4,
-    },
+  photoContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  photoTouchable: {
+    position: 'relative',
+  },
+  photoImage: {
+    width: '100%',
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+  },
+  deleteButton: {
+    position: 'absolute',
+    backgroundColor: 'rgba(255, 0, 0, 0.7)',
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  photoInfo: {
+    // Padding será aplicado dinamicamente
+  },
+  locationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  locationText: {
+    color: '#666',
+    marginLeft: 4,
+    flex: 1,
+  },
+  dateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  dateText: {
+    color: '#666',
+    marginLeft: 4,
+    flex: 1,
+  },
 });
