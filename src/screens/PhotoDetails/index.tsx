@@ -37,7 +37,7 @@ const getResponsiveValues = (dimensions: ReturnType<typeof useResponsiveDimensio
   if (isTablet) {
     panelHeight = isLandscape ? height * 0.6 : height * 0.45;
   } else {
-    panelHeight = isLandscape ? height * 0.7 : height * 0.4;
+    panelHeight = isLandscape ? height * 0.7 : isSmallScreen ? height * 0.65 : height * 0.4;
   }
   
   const iconSize = isSmallScreen ? 24 : isTablet ? 32 : 28;
@@ -229,7 +229,7 @@ export default function PhotoDetails({ route }: { route: { params: { id: string 
     },
     imageContainer: {
       width: dimensions.width,
-      height: dimensions.height,
+      height: dimensions.height, 
       justifyContent: 'center',
       alignItems: 'center',
     },
