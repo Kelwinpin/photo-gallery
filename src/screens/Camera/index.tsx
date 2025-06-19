@@ -1,9 +1,10 @@
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import React, { useEffect, useState, useRef } from 'react';
-import { Button, StyleSheet, Text, TouchableOpacity, View, Alert, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, Alert, ActivityIndicator } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import * as Location from 'expo-location';
+import { Button } from '../../components/Button';
 import { photoService } from '../../services/photoService';
 
 export default function CameraScreen() {
@@ -122,12 +123,8 @@ export default function CameraScreen() {
       <View style={styles.container}>
         <Text style={styles.message}>Precisamos de permissão para usar a câmera</Text>
         <View style={styles.buttonPermissionContainer}>
-          <TouchableOpacity onPress={() => requestPermission()} style={styles.button}>
-            <Text style={{ color: 'white' }}>Conceder Permissão</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigate.goBack()} style={styles.buttonOutlined}>
-            <Text style={{ color: '#6200EE' }}>Agora Não</Text>
-          </TouchableOpacity>
+          <Button text="Permitir" onPress={() => requestPermission()} />
+          <Button text="Agora Não" onPress={() => navigate.goBack()} type='outlined' />
         </View>
       </View>
     );
@@ -141,7 +138,7 @@ export default function CameraScreen() {
     <View style={styles.container}>
       <CameraView 
         ref={cameraRef}
-        style={{ flex: 1 }} 
+        style={{ flex: 1, width: '100%', height: '100%' }}
         facing={facing}
       >
         <View style={styles.buttonContainer}>
@@ -202,14 +199,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  buttonOutlined:{
-    backgroundColor: 'white',
-    padding: 10,
-    borderRadius: 10,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: '#6200EE',
-  },
   message: {
     textAlign: 'center',
     paddingBottom: 10,
@@ -217,10 +206,6 @@ const styles = StyleSheet.create({
   button: {
     alignSelf: 'flex-end',
     alignItems: 'center',
-    backgroundColor: '#6200EE',
-    padding: 10,
-    borderRadius: 10,
-    marginBottom: 10,
   },
   buttonContainer: {
     flex: 1,
