@@ -14,7 +14,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import Card from '../../components/Card';
 
 export default function Home() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);

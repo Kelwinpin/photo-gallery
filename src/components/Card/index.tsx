@@ -7,7 +7,7 @@ import { formatCoordinate } from "../../utils/fomatCoords";
 import { useNavigation } from "@react-navigation/native";
 
 export default function Card({ item, handleDeletePhoto }: { item: Photo, handleDeletePhoto: (photoId: string) => void }) {
-    const navigation = useNavigation();
+    const navigation = useNavigation<any>();
 
     return (
         <View style={styles.photoContainer}>
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
         padding: 6,
     },
     photoInfo: {
-        padding: 12,
+        padding: 15,
     },
     locationContainer: {
         flexDirection: 'row',

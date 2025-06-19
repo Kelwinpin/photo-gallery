@@ -7,7 +7,8 @@ import { Photo } from "../../services/photoService";
 export default function PhotoDetailsPanel({ photo, closePanel }: { photo: Photo, closePanel: () => void }) {
   return (
     <>
-        <View style={styles.panelHandle} /><View style={styles.panelContent}>
+        <View style={styles.panelHandle} />
+          <View style={styles.panelContent}>
             <Text style={styles.panelTitle}>Detalhes da Foto</Text>
             <TouchableOpacity style={styles.closeButton} onPress={closePanel}>
                     <Ionicons name="arrow-down-circle-outline" size={32} color="#6200EE" />
