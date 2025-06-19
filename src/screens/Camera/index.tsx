@@ -1,6 +1,6 @@
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import React, { useEffect, useState, useRef } from 'react';
-import { Button, StyleSheet, Text, TouchableOpacity, View, Alert } from 'react-native';
+import { Button, StyleSheet, Text, TouchableOpacity, View, Alert, ActivityIndicator } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import * as Location from 'expo-location';
@@ -12,24 +12,40 @@ export default function CameraScreen() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isCapturing, setIsCapturing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   
   const cameraRef = useRef<CameraView>(null);
   const navigate = useNavigation();
 
   useEffect(() => {
     async function getCurrentLocation() {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
-        return;
-      }
+      try {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          setErrorMsg('Permission to access location was denied');
+          return;
+        }
 
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
+        let location = await Location.getCurrentPositionAsync({});
+        setLocation(location);
+      } catch (error) {
+        console.error('Erro ao obter localização:', error);
+        setErrorMsg('Erro ao obter localização');
+      } finally {
+        setIsLoading(false);
+      }
     }
 
     getCurrentLocation();
   }, []);
+
+  useEffect(() => {
+    if (permission !== null) {
+      if (!isLoading || location !== null || errorMsg !== null) {
+        setIsLoading(false);
+      }
+    }
+  }, [permission, location, errorMsg, isLoading]);
 
   const saveImage = async () => {
     if (!cameraRef.current || isCapturing) return;
@@ -83,16 +99,36 @@ export default function CameraScreen() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#007AFF" />
+        <Text style={styles.loadingText}>Carregando câmera...</Text>
+      </View>
+    );
+  }
+
   if (!permission) {
-    return <View />;
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#007AFF" />
+        <Text style={styles.loadingText}>Verificando permissões...</Text>
+      </View>
+    );
   }
 
   if (!permission.granted) {
     return (
       <View style={styles.container}>
         <Text style={styles.message}>Precisamos de permissão para usar a câmera</Text>
-        <Button onPress={requestPermission} title="Permitir" />
-        <Button onPress={() => navigate.goBack()} title="Agora Não" />
+        <View style={styles.buttonPermissionContainer}>
+          <TouchableOpacity onPress={() => requestPermission()} style={styles.button}>
+            <Text style={{ color: 'white' }}>Conceder Permissão</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigate.goBack()} style={styles.buttonOutlined}>
+            <Text style={{ color: '#6200EE' }}>Agora Não</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
@@ -149,6 +185,30 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#000',
+  },
+  loadingText: {
+    color: 'white',
+    marginTop: 16,
+    fontSize: 16,
+  },
+  buttonPermissionContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonOutlined:{
+    backgroundColor: 'white',
+    padding: 10,
+    borderRadius: 10,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#6200EE',
   },
   message: {
     textAlign: 'center',
@@ -157,6 +217,10 @@ const styles = StyleSheet.create({
   button: {
     alignSelf: 'flex-end',
     alignItems: 'center',
+    backgroundColor: '#6200EE',
+    padding: 10,
+    borderRadius: 10,
+    marginBottom: 10,
   },
   buttonContainer: {
     flex: 1,

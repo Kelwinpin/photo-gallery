@@ -1,15 +1,17 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { formatDate } from "../../utils/fomatDate";
 import { Photo } from "../../services/photoService";
 
-export default function PhotoDetailsPanel({ photo }: { photo: Photo }) {
+export default function PhotoDetailsPanel({ photo, closePanel }: { photo: Photo, closePanel: () => void }) {
   return (
     <>
         <View style={styles.panelHandle} /><View style={styles.panelContent}>
             <Text style={styles.panelTitle}>Detalhes da Foto</Text>
-
+            <TouchableOpacity style={styles.closeButton} onPress={closePanel}>
+                    <Ionicons name="arrow-down-circle-outline" size={32} color="#6200EE" />
+            </TouchableOpacity>
             <View style={styles.section}>
                 <View style={styles.sectionHeader}>
                     <Ionicons name="time-outline" size={24} color="#6200EE" />
@@ -40,7 +42,14 @@ export default function PhotoDetailsPanel({ photo }: { photo: Photo }) {
 }
 
 const styles = StyleSheet.create({
-   panelHandle: {
+   closeButton: {
+    position: 'absolute',
+    top: 0,
+    right: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  panelHandle: {
     width: 40,
     height: 4,
     backgroundColor: '#ddd',

@@ -16,7 +16,7 @@ export default function AddButton({ onPress }: IAddButton) {
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#517e44',
+    backgroundColor: '#6200EE',
     padding: 10,
     borderRadius: 32,
     marginBottom: 10,

@@ -113,7 +113,7 @@ export default function Home() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={['#6200EE']}
+            colors={['#9bbb85']}
           />
         }
         ListEmptyComponent={renderEmptyState}

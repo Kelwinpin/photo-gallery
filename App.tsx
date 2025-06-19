@@ -5,8 +5,9 @@ import HomeScreen from './src/screens/Home';
 import CameraScreen from './src/screens/Camera';
 import PhotoDetails from './src/screens/PhotoDetails';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { RootStackParamList } from './src/@types/navigation';
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 
 

@@ -250,7 +250,7 @@ export default function PhotoDetails({ route }: { route: { params: { id: string 
 
       <GestureDetector gesture={panGesture}>
         <Animated.View style={[styles.infoPanel, animatedPanelStyle]}>
-            <PhotoDetailsPanel photo={photo} />
+            <PhotoDetailsPanel photo={photo} closePanel={togglePanel} />
         </Animated.View>
       </GestureDetector>
     </View>
