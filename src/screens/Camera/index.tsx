@@ -1,7 +1,6 @@
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import React, { useEffect, useState, useRef } from 'react';
 import { Button, StyleSheet, Text, TouchableOpacity, View, Alert } from 'react-native';
-import { ButtonContainer, Container } from './styles';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import * as Location from 'expo-location';
@@ -90,11 +89,11 @@ export default function CameraScreen() {
 
   if (!permission.granted) {
     return (
-      <Container>
+      <View style={styles.container}>
         <Text style={styles.message}>Precisamos de permissão para usar a câmera</Text>
         <Button onPress={requestPermission} title="Permitir" />
         <Button onPress={() => navigate.goBack()} title="Agora Não" />
-      </Container>
+      </View>
     );
   }
 
@@ -103,13 +102,13 @@ export default function CameraScreen() {
   }
 
   return (
-    <Container>
+    <View style={styles.container}>
       <CameraView 
         ref={cameraRef}
         style={{ flex: 1 }} 
         facing={facing}
       >
-        <ButtonContainer>
+        <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
             <Ionicons name="camera-reverse-sharp" size={48} color="white" />
           </TouchableOpacity>
@@ -129,7 +128,7 @@ export default function CameraScreen() {
           <TouchableOpacity style={styles.buttonClose} onPress={() => navigate.goBack()}>
             <Ionicons name="close" size={40} color="white" />
           </TouchableOpacity>
-        </ButtonContainer>
+        </View>
         
         <View style={styles.locationIndicator}>
           <Ionicons 
@@ -142,11 +141,15 @@ export default function CameraScreen() {
           </Text>
         </View>
       </CameraView>
-    </Container>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+  },
   message: {
     textAlign: 'center',
     paddingBottom: 10,
@@ -154,6 +157,14 @@ const styles = StyleSheet.create({
   button: {
     alignSelf: 'flex-end',
     alignItems: 'center',
+  },
+  buttonContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingBottom: 64,
+    flexDirection: 'row',
+    gap: 40,
   },
   buttonDisabled: {
     opacity: 0.5,

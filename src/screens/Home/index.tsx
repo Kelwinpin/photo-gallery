@@ -7,7 +7,6 @@ import {
   View,
   StyleSheet
 } from 'react-native';
-import { Container } from './styles';
 import AddButton from '../../components/AddButton';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { photoService, Photo } from '../../services/photoService';
@@ -84,17 +83,17 @@ export default function Home() {
 
   if (loading) {
     return (
-      <Container>
+      <View style={styles.container}>
         <View style={styles.loadingContainer}>
           <Text style={styles.loadingText}>Carregando fotos...</Text>
         </View>
         <AddButton onPress={() => navigation.navigate("Camera")} />
-      </Container>
+      </View>
     );
   }
 
   return (
-    <Container>
+    <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Minhas Fotos</Text>
         <Text style={styles.subtitle}>
@@ -121,11 +120,14 @@ export default function Home() {
       />
 
       <AddButton onPress={() => navigation.navigate("Camera")} />
-    </Container>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   header: {
     padding: 30,
     paddingBottom: 10,
