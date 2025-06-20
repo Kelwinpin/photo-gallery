@@ -5,6 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { formatDate } from "../../utils/fomatDate";
 import { formatCoordinate } from "../../utils/fomatCoords";
 import { useNavigation } from "@react-navigation/native";
+import { RootStackParamList } from "../../@types/navigation";
 
 interface CardProps {
   item: Photo;
@@ -14,14 +15,14 @@ interface CardProps {
   cardMargin: number;
 }
 
-export default function Card({ 
-  item, 
-  handleDeletePhoto, 
-  cardWidth, 
-  imageHeight, 
-  cardMargin 
+export default function Card({
+  item,
+  handleDeletePhoto,
+  cardWidth,
+  imageHeight,
+  cardMargin
 }: CardProps) {
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation<RootStackParamList>();
 
   // Calcular valores responsivos baseados no cardWidth
   const isSmallCard = cardWidth < 150;
@@ -31,11 +32,11 @@ export default function Card({
   // Tamanhos de fonte responsivos
   const locationFontSize = isSmallCard ? 10 : isMediumCard ? 11 : 12;
   const dateFontSize = isSmallCard ? 10 : isMediumCard ? 11 : 12;
-  
+
   // Tamanhos de ícones responsivos
   const iconSize = isSmallCard ? 12 : 14;
   const deleteIconSize = isSmallCard ? 16 : 18;
-  
+
   // Espaçamentos responsivos
   const infoPadding = isSmallCard ? 8 : isMediumCard ? 12 : 15;
   const locationMarginBottom = isSmallCard ? 4 : 6;
@@ -91,6 +92,7 @@ export default function Card({
         <TouchableOpacity
           style={[styles.deleteButton, dynamicStyles.deleteButton]}
           onPress={() => handleDeletePhoto(item.id)}
+          testID="delete-button"
         >
           <Ionicons name="trash" size={deleteIconSize} color="white" />
         </TouchableOpacity>
