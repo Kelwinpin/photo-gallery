@@ -76,7 +76,7 @@ export default function Card({
   });
 
   return (
-    <View style={[styles.photoContainer, dynamicStyles.photoContainer]}>
+    <View style={[styles.photoContainer, dynamicStyles.photoContainer]} testID="card-container">
       <TouchableOpacity
         style={styles.photoTouchable}
         onPress={() => {
@@ -87,6 +87,7 @@ export default function Card({
           source={{ uri: item.uri }}
           style={[styles.photoImage, dynamicStyles.photoImage]}
           resizeMode="cover"
+          testID="card-image"
         />
 
         <TouchableOpacity

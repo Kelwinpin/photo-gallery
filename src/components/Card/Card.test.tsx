@@ -82,10 +82,24 @@ describe('Card Component', () => {
         );
 
         const container = getByTestId('card-container');
-        expect(container.props.style).toMatchObject({
-            width: 120,
-            margin: 5,
-        });
+        expect(container.props.style).toMatchObject([
+            {
+                "backgroundColor": "#fff",
+                "borderRadius": 12,
+                "elevation": 3,
+                "shadowColor": "#000",
+                "shadowOffset": {
+                    "height": 2,
+                    "width": 0
+                },
+                "shadowOpacity": 0.1,
+                "shadowRadius": 4
+            },
+            {
+                "margin": 5,
+                "width": 120
+            }
+        ]);
     });
 
     it('should render image with correct source', () => {
@@ -106,6 +120,6 @@ describe('Card Component', () => {
             </CardWithNavigation>
         );
 
-        expect(getByText('teste')).toBeTruthy();
+        expect(getByText('01/01/2024 10:00')).toBeTruthy();
     });
 });
