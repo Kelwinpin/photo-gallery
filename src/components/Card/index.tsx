@@ -13,6 +13,7 @@ interface CardProps {
   cardWidth: number;
   imageHeight: number;
   cardMargin: number;
+  TestId?: string;
 }
 
 export default function Card({
@@ -20,24 +21,21 @@ export default function Card({
   handleDeletePhoto,
   cardWidth,
   imageHeight,
-  cardMargin
+  cardMargin,
+  TestId
 }: CardProps) {
   const navigation = useNavigation<RootStackParamList>();
 
-  // Calcular valores responsivos baseados no cardWidth
   const isSmallCard = cardWidth < 150;
   const isMediumCard = cardWidth >= 150 && cardWidth < 200;
   const isLargeCard = cardWidth >= 200;
 
-  // Tamanhos de fonte responsivos
   const locationFontSize = isSmallCard ? 10 : isMediumCard ? 11 : 12;
   const dateFontSize = isSmallCard ? 10 : isMediumCard ? 11 : 12;
 
-  // Tamanhos de ícones responsivos
   const iconSize = isSmallCard ? 12 : 14;
   const deleteIconSize = isSmallCard ? 16 : 18;
 
-  // Espaçamentos responsivos
   const infoPadding = isSmallCard ? 8 : isMediumCard ? 12 : 15;
   const locationMarginBottom = isSmallCard ? 4 : 6;
   const deleteButtonSize = isSmallCard ? 28 : 32;
@@ -45,7 +43,6 @@ export default function Card({
   const deleteButtonTop = isSmallCard ? 6 : 8;
   const deleteButtonRight = isSmallCard ? 6 : 8;
 
-  // Estilos dinâmicos
   const dynamicStyles = StyleSheet.create({
     photoContainer: {
       width: cardWidth,

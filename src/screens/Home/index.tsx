@@ -10,7 +10,7 @@ import {
 import AddButton from '../../components/AddButton';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { photoService, Photo } from '../../services/photoService';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import Icon from 'react-native-vector-icons/Ionicons';
 import Card from '../../components/Card';
 import useResponsiveDimensions from '../../utils/hooks/useResponsiveDimensions';
 
@@ -174,7 +174,7 @@ export default function Home() {
 
   const renderEmptyState = () => (
     <View style={[styles.emptyContainer, dynamicStyles.emptyContainer]}>
-      <Ionicons 
+      <Icon 
         name="camera-outline" 
         size={responsiveValues.emptyIconSize} 
         color="#ccc" 
@@ -217,7 +217,7 @@ export default function Home() {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <Card 
-            item={item} 
+            item={item}
             handleDeletePhoto={handleDeletePhoto}
             cardWidth={responsiveValues.cardWidth}
             imageHeight={responsiveValues.imageHeight}
@@ -231,6 +231,7 @@ export default function Home() {
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
+            testID="refresh-control"
             refreshing={refreshing}
             onRefresh={onRefresh}
             colors={['#9bbb85']}
@@ -241,9 +242,10 @@ export default function Home() {
         maxToRenderPerBatch={responsiveValues.numColumns * 4}
         windowSize={10}
         initialNumToRender={responsiveValues.numColumns * 6}
+        testID="photos-list"
       />
 
-      <AddButton onPress={() => navigation.navigate("Camera")} />
+      <AddButton onPress={() => navigation.navigate("Camera")} testID='add-button' />
     </View>
   );
 }
