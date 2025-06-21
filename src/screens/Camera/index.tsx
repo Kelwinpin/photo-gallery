@@ -8,7 +8,7 @@ import {
   Alert, 
   ActivityIndicator 
 } from 'react-native';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import * as Location from 'expo-location';
 import { Button } from '../../components/Button';
@@ -229,7 +229,7 @@ export default function CameraScreen() {
       >
         <View style={[styles.buttonContainer, dynamicStyles.buttonContainer]}>
           <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
-            <Ionicons 
+            <Icon 
               name="camera-reverse-sharp" 
               size={responsiveValues.iconSize} 
               color="white" 
@@ -240,8 +240,9 @@ export default function CameraScreen() {
             style={[styles.button, isCapturing && styles.buttonDisabled]} 
             onPress={saveImage}
             disabled={isCapturing}
+            testID="camera-button-save"
           >
-            <Ionicons 
+            <Icon 
               name={isCapturing ? "hourglass" : "camera"} 
               size={responsiveValues.iconSize} 
               color={isCapturing ? "gray" : "white"} 
@@ -251,8 +252,9 @@ export default function CameraScreen() {
           <TouchableOpacity 
             style={[styles.buttonClose, dynamicStyles.buttonClose]} 
             onPress={() => navigate.goBack()}
+            testID="camera-button-close"
           >
-            <Ionicons 
+            <Icon 
               name="close" 
               size={responsiveValues.closeIconSize} 
               color="white" 
@@ -261,7 +263,7 @@ export default function CameraScreen() {
         </View>
         
         <View style={[styles.locationIndicator, dynamicStyles.locationIndicator]}>
-          <Ionicons 
+          <Icon 
             name={location ? "location" : "location-outline"} 
             size={responsiveValues.locationIconSize} 
             color={location ? "green" : "red"} 
