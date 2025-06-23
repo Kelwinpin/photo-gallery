@@ -1,15 +1,16 @@
 import React from 'react';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { TouchableOpacity, StyleSheet } from 'react-native';
 
 interface IAddButton {
   onPress: () => void;
+  testID?: string;
 }
 
-export default function AddButton({ onPress }: IAddButton) {
+export default function AddButton({ onPress, testID }: IAddButton) {
   return (
-    <TouchableOpacity onPress={onPress} style={styles.button}>
-       <Ionicons name="add-sharp" size={32} color="white" />
+    <TouchableOpacity onPress={onPress} style={styles.button} testID={testID || 'add-button'}>
+      <Icon name="add-sharp" size={32} color="white" testID="add-button-icon" />
     </TouchableOpacity>
   );
 }

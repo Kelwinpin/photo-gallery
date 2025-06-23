@@ -11,7 +11,7 @@ export function Button({ text, onPress, type = 'filled' }: IButton) {
   const style = type === 'outlined' ? styles.buttonOutlined : styles.button;
 
   return (
-    <TouchableOpacity style={[style, styles.commons]} onPress={onPress}>
+    <TouchableOpacity style={[style, styles.commons]} onPress={onPress} testID="button-touchable">
       <Text style={{ color: type === 'outlined' ? '#6200EE' : 'white' }}>
         {text}
       </Text>

@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
-import Ionicons from '@expo/vector-icons/Ionicons';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { formatDate } from "../../utils/fomatDate";
 import { Photo } from "../../services/photoService";
 import useResponsiveDimensions from "../../utils/hooks/useResponsiveDimensions";
@@ -133,17 +133,20 @@ export default function PhotoDetailsPanel({
           style={[styles.closeButton, dynamicStyles.closeButton]} 
           onPress={closePanel}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          testID="close-button"
         >
-          <Ionicons 
+          <Icon 
             name="arrow-down-circle-outline" 
             size={responsiveValues.closeIconSize} 
             color="#6200EE" 
+            testID="icon-close"
           />
         </TouchableOpacity>
         
         <View style={[styles.section, dynamicStyles.section]}>
           <View style={[styles.sectionHeader, dynamicStyles.sectionHeader]}>
-            <Ionicons 
+            <Icon 
+              testID="icon-time-outline"
               name="time-outline" 
               size={responsiveValues.iconSize} 
               color="#6200EE" 
@@ -159,7 +162,8 @@ export default function PhotoDetailsPanel({
 
         <View style={[styles.section, dynamicStyles.section]}>
           <View style={[styles.sectionHeader, dynamicStyles.sectionHeader]}>
-            <Ionicons 
+            <Icon 
+              testID="icon-location-outline"
               name="location-outline" 
               size={responsiveValues.iconSize} 
               color="#6200EE" 
@@ -168,8 +172,8 @@ export default function PhotoDetailsPanel({
               Localização
             </Text>
           </View>
-          <View style={[styles.coordinatesDetails, dynamicStyles.coordinatesDetails]}>
-            <View style={[styles.coordinateItem, dynamicStyles.coordinateItem]}>
+          <View style={[styles.coordinatesDetails, dynamicStyles.coordinatesDetails]} testID="coordinates-details">
+            <View style={[styles.coordinateItem, dynamicStyles.coordinateItem]} testID="coordinate-item">
               <Text style={[styles.coordinateLabel, dynamicStyles.coordinateLabel]}>
                 Latitude
               </Text>
@@ -177,7 +181,7 @@ export default function PhotoDetailsPanel({
                 {photo.location.latitude.toFixed(6)}
               </Text>
             </View>
-            <View style={[styles.coordinateItem, dynamicStyles.coordinateItem]}>
+            <View style={[styles.coordinateItem, dynamicStyles.coordinateItem]} testID="coordinate-item">
               <Text style={[styles.coordinateLabel, dynamicStyles.coordinateLabel]}>
                 Longitude
               </Text>
