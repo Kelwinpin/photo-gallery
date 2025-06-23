@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  Image, 
-  TouchableOpacity, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
   Alert,
   Share,
-  Dimensions,
   SafeAreaView,
   StatusBar
 } from "react-native";
@@ -22,28 +21,28 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { Photo, photoService } from "../../services/photoService";
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import { formatDate } from "../../utils/fomatDate";
 import { formatCoordinate } from "../../utils/fomatCoords";
 import PhotoDetailsPanel from "../../components/PhotoDetailsPanel";
 import useResponsiveDimensions from "../../utils/hooks/useResponsiveDimensions";
+import Icon from 'react-native-vector-icons/Ionicons';
 
 
 const getResponsiveValues = (dimensions: ReturnType<typeof useResponsiveDimensions>) => {
   const { width, height, isTablet, isLandscape, isSmallScreen } = dimensions;
-  
+
   let panelHeight;
   if (isTablet) {
     panelHeight = isLandscape ? height * 0.6 : height * 0.45;
   } else {
     panelHeight = isLandscape ? height * 0.7 : isSmallScreen ? height * 0.65 : height * 0.4;
   }
-  
+
   const iconSize = isSmallScreen ? 24 : isTablet ? 32 : 28;
   const infoButtonSize = isSmallScreen ? 50 : isTablet ? 70 : 60;
   const headerPadding = isSmallScreen ? 12 : isTablet ? 24 : 20;
-  
+
   return {
     panelHeight,
     iconSize,
@@ -88,12 +87,12 @@ export default function PhotoDetails({ route }: { route: { params: { id: string 
 
   const togglePanel = () => {
     const isOpening = !isPanelOpen;
-    
+
     translateY.value = withSpring(isOpening ? 0 : responsiveValues.panelHeight, {
       damping: 20,
       stiffness: 90,
     });
-    
+
     headerOpacity.value = withTiming(isOpening ? 0.3 : 1, {
       duration: 300,
     });
@@ -105,7 +104,7 @@ export default function PhotoDetails({ route }: { route: { params: { id: string 
     .onUpdate((event) => {
       const newTranslateY = Math.max(0, Math.min(responsiveValues.panelHeight, event.translationY));
       translateY.value = newTranslateY;
-      
+
       const progress = 1 - (newTranslateY / responsiveValues.panelHeight);
       headerOpacity.value = interpolate(
         progress,
@@ -116,12 +115,12 @@ export default function PhotoDetails({ route }: { route: { params: { id: string 
     })
     .onEnd((event) => {
       const shouldOpen = event.translationY < responsiveValues.panelHeight / 2;
-      
+
       translateY.value = withSpring(shouldOpen ? 0 : responsiveValues.panelHeight, {
         damping: 20,
         stiffness: 90,
       });
-      
+
       headerOpacity.value = withTiming(shouldOpen ? 0.3 : 1, {
         duration: 300,
       });
@@ -229,7 +228,7 @@ export default function PhotoDetails({ route }: { route: { params: { id: string 
     },
     imageContainer: {
       width: dimensions.width,
-      height: dimensions.height, 
+      height: dimensions.height,
       justifyContent: 'center',
       alignItems: 'center',
     },
@@ -273,15 +272,15 @@ export default function PhotoDetails({ route }: { route: { params: { id: string 
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.errorContainer}>
-          <Ionicons 
-            name="alert-circle-outline" 
-            size={dimensions.isTablet ? 80 : 64} 
-            color="#ccc" 
+          <Icon
+            name="alert-circle-outline"
+            size={dimensions.isTablet ? 80 : 64}
+            color="#ccc"
           />
           <Text style={[styles.errorText, dynamicStyles.errorText]}>
             Foto não encontrada
           </Text>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.backButton, dynamicStyles.backButton]}
             onPress={() => navigation.goBack()}
           >
@@ -297,56 +296,59 @@ export default function PhotoDetails({ route }: { route: { params: { id: string 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="black" />
-      
+
       <View style={dynamicStyles.imageContainer}>
-        <Image 
-          source={{ uri: photo.uri }} 
+        <Image
+          source={{ uri: photo.uri }}
           style={dynamicStyles.fullscreenImage}
           resizeMode="contain"
+          accessibilityLabel="image"
         />
       </View>
 
       <Animated.View style={[styles.header, dynamicStyles.header, animatedHeaderStyle]}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={[styles.headerButton, dynamicStyles.headerButton]}
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name="arrow-back" size={responsiveValues.iconSize} color="white" />
+          <Icon name="arrow-back" size={responsiveValues.iconSize} color="white" />
         </TouchableOpacity>
-        
+
         <View style={[styles.headerActions, dynamicStyles.headerActions]}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.headerButton, dynamicStyles.headerButton]}
             onPress={handleSharePhoto}
+            accessibilityLabel="share"
           >
-            <Ionicons name="share-outline" size={responsiveValues.iconSize} color="white" />
+            <Icon name="share-outline" size={responsiveValues.iconSize} color="white" />
           </TouchableOpacity>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={[styles.headerButton, dynamicStyles.headerButton]}
             onPress={handleDeletePhoto}
+            accessibilityLabel="delete"
           >
-            <Ionicons name="trash-outline" size={responsiveValues.iconSize} color="white" />
+            <Icon name="trash-outline" size={responsiveValues.iconSize} color="white" />
           </TouchableOpacity>
         </View>
       </Animated.View>
 
-      <TouchableOpacity 
+      <TouchableOpacity
         style={[styles.infoButton, dynamicStyles.infoButton]}
         onPress={togglePanel}
         activeOpacity={0.8}
       >
-        <Ionicons 
-          name={isPanelOpen ? "close" : "information-circle-outline"} 
-          size={responsiveValues.iconSize + 4} 
-          color="white" 
+        <Icon
+          name={isPanelOpen ? "close" : "information-circle-outline"}
+          size={responsiveValues.iconSize + 4}
+          color="white"
         />
       </TouchableOpacity>
 
       <Animated.View style={[styles.backdrop, animatedBackdropStyle]} />
 
       <GestureDetector gesture={panGesture}>
-        <Animated.View style={[styles.infoPanel, dynamicStyles.infoPanel, animatedPanelStyle]}>
+        <Animated.View style={[styles.infoPanel, dynamicStyles.infoPanel, animatedPanelStyle]} accessibilityLabel="toggle-info">
           <PhotoDetailsPanel photo={photo} closePanel={togglePanel} />
         </Animated.View>
       </GestureDetector>
